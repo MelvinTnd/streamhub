@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreamHub - Films et Séries</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-dark" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,.06);">
+    <div class="container d-flex align-items-center justify-content-between py-3">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#" style="font-weight:800; letter-spacing:-0.02em;">
+        <span style="color:#00e0ff;">Stream</span>Hub
+      </a>
+      <form class="d-none d-md-flex" role="search" style="flex:1; max-width:520px; margin: 0 16px;">
+        <input class="form-control" type="search" placeholder="Rechercher films, séries..." aria-label="Rechercher" style="background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#e6eaf2;">
+      </form>
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-primary" type="button">Se connecter</button>
+        <button class="btn btn-outline-light d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTrends" aria-controls="offcanvasTrends">Tendances</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Carrousel Hero -->
+  <div id="hero" class="hero">
+    <div class="content">
+      <h1 id="hero-title">Titre du Film</h1>
+      <p id="hero-year">2025</p>
+      <p id="hero-genre">Action, Drame</p>
+      <p id="hero-summary">Résumé du film...</p>
+      <div class="d-flex gap-2 justify-content-center mt-3">
+        <button class="btn btn-primary">Regarder</button>
+        <button class="btn btn-outline-light">Plus d'infos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar d-none d-lg-block" aria-label="Top 20 des Tendances (bureau)">
+    <h5>Top 20 des Tendances</h5>
+    <ul id="sidebar-list">
+      <!-- Liste des films tendance -->
+    </ul>
+  </div>
+
+  <!-- Grille de Films -->
+  <div class="container mt-5">
+    <div class="row g-3 g-md-4" id="movie-grid">
+      <!-- Cartes de films -->
+    </div>
+    <div class="load-more-container">
+      <div class="d-flex justify-content-center">
+        <button id="load-more" class="btn btn-primary">Voir Plus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recommandations par Catégorie -->
+  <div class="container mt-5">
+    <h3>Recommandations</h3>
+    <div class="row g-3 g-md-4" id="recommendations">
+      <!-- Cartes de recommandations -->
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+
+  <!-- Modal Film Details -->
+  <div class="modal fade" id="movieModal" tabindex="-1" aria-labelledby="movieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="movieModalLabel">Détails du Film</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <div class="movie-details">
+            <div>
+              <img id="modal-poster" class="movie-poster" src="" alt="">
+            </div>
+            <div class="movie-info">
+              <h2 id="modal-title"></h2>
+              <div id="modal-genres"></div>
+              <p id="modal-overview"></p>
+              <div class="streaming-options" id="modal-streaming">
+                <!-- Options de streaming -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offcanvas Tendances (mobile) -->
+  <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasTrends" aria-labelledby="offcanvasTrendsLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasTrendsLabel">Top 20 des Tendances</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul id="sidebar-list-mobile" class="list-unstyled m-0 p-0"></ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>StreamHub</h5>
+          <p>Votre destination pour découvrir les meilleurs films et séries. Trouvez où regarder vos contenus préférés sur toutes les plateformes de streaming.</p>
+        </div>
+        <div class="col-md-2">
+          <h5>Films</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Populaires</a></li>
+            <li><a href="#">Tendances</a></li>
+            <li><a href="#">Nouveautés</a></li>
+            <li><a href="#">Top Rated</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2">
+          <h5>Genres</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Comédie</a></li>
+            <li><a href="#">Drame</a></li>
+            <li><a href="#">Science-Fiction</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2">
+          <h5>Plateformes</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Netflix</a></li>
+            <li><a href="#">Amazon Prime</a></li>
+            <li><a href="#">Disney+</a></li>
+            <li><a href="#">HBO Max</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2">
+          <h5>Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Aide</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">À propos</a></li>
+            <li><a href="#">API</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 StreamHub. Données fournies par <a href="https://www.themoviedb.org/" target="_blank">TMDB</a> et <a href="https://rapidapi.com/movie-of-the-night2/api/streaming-availability" target="_blank">Streaming Availability</a>.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
