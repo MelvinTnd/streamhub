@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreamHub - Lecteur Vidéo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/watch.css">
+</head>
+<body class="watch-page">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-dark watch-navbar">
+    <div class="container d-flex align-items-center justify-content-between py-3">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html" style="font-weight:800; letter-spacing:-0.02em;">
+        <span style="color:#00e0ff;">Stream</span>Hub
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-light btn-sm" onclick="toggleFullscreen()">
+          <i class="bi bi-arrows-fullscreen"></i> Plein écran
+        </button>
+        <button class="btn btn-outline-light btn-sm" onclick="goBack()">
+          <i class="bi bi-arrow-left"></i> Retour
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Video Player Container -->
+  <div class="video-container" id="videoContainer">
+    <div class="video-wrapper">
+      <!-- Video Element -->
+      <video id="videoPlayer" class="video-player" preload="metadata">
+        <source src="" type="video/mp4">
+        Votre navigateur ne supporte pas la lecture vidéo.
+      </video>
+      
+      <!-- Video Overlay -->
+      <div class="video-overlay" id="videoOverlay">
+        <div class="video-info">
+          <h1 id="videoTitle" class="video-title">Titre du Film</h1>
+          <p id="videoSubtitle" class="video-subtitle">2024 • Action, Drame • 2h 30min</p>
+          <div class="video-actions">
+            <button class="btn btn-primary btn-lg" onclick="playVideo()">
+              <i class="bi bi-play-fill"></i> Regarder
+            </button>
+            <button class="btn btn-outline-light btn-lg" onclick="toggleMute()">
+              <i class="bi bi-volume-up"></i>
+            </button>
+            <button class="btn btn-outline-light btn-lg" onclick="toggleFullscreen()">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Controls -->
+      <div class="video-controls" id="videoControls">
+        <div class="controls-top">
+          <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-fill" id="progressFill"></div>
+              <div class="progress-handle" id="progressHandle"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="controls-bottom">
+          <div class="controls-left">
+            <button class="control-btn" onclick="togglePlay()" id="playBtn">
+              <i class="bi bi-play-fill"></i>
+            </button>
+            <button class="control-btn" onclick="skipTime(-10)">
+              <i class="bi bi-skip-backward-fill"></i>
+            </button>
+            <button class="control-btn" onclick="skipTime(10)">
+              <i class="bi bi-skip-forward-fill"></i>
+            </button>
+            <div class="volume-container">
+              <button class="control-btn" onclick="toggleMute()" id="muteBtn">
+                <i class="bi bi-volume-up"></i>
+              </button>
+              <div class="volume-slider">
+                <input type="range" id="volumeSlider" min="0" max="100" value="100" oninput="setVolume(this.value)">
+              </div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            </div>
+          </div>
+          
+          <div class="controls-right">
+            <div class="quality-selector">
+              <select id="qualitySelect" onchange="changeQuality(this.value)">
+                <option value="auto">Auto</option>
+                <option value="1080p">1080p</option>
+                <option value="720p">720p</option>
+                <option value="480p">480p</option>
+              </select>
+            </div>
+            <button class="control-btn" onclick="toggleFullscreen()" id="fullscreenBtn">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </button>
+            <button class="control-btn" onclick="toggleSettings()">
+              <i class="bi bi-gear"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Panel -->
+      <div class="settings-panel" id="settingsPanel">
+        <div class="settings-content">
+          <h6>Paramètres</h6>
+          <div class="setting-group">
+            <label>Qualité</label>
+            <select id="settingsQuality" onchange="changeQuality(this.value)">
+              <option value="auto">Automatique</option>
+              <option value="1080p">1080p</option>
+              <option value="720p">720p</option>
+              <option value="480p">480p</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>Vitesse de lecture</label>
+            <select id="playbackSpeed" onchange="setPlaybackSpeed(this.value)">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>Sous-titres</label>
+            <select id="subtitles" onchange="toggleSubtitles(this.value)">
+              <option value="off">Désactivés</option>
+              <option value="fr">Français</option>
+              <option value="en">Anglais</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Movie Info Panel -->
+  <div class="movie-info-panel">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="movie-details">
+            <h2 id="movieTitle">Titre du Film</h2>
+            <div class="movie-meta">
+              <span class="year" id="movieYear">2024</span>
+              <span class="rating" id="movieRating">★ 8.5</span>
+              <span class="duration" id="movieDuration">2h 30min</span>
+              <span class="genres" id="movieGenres">Action, Drame</span>
+            </div>
+            <p class="movie-description" id="movieDescription">
+              Description du film...
+            </p>
+            <div class="movie-actions">
+              <button class="btn btn-primary">
+                <i class="bi bi-play-fill"></i> Regarder maintenant
+              </button>
+              <button class="btn btn-outline-light">
+                <i class="bi bi-plus"></i> Ma liste
+              </button>
+              <button class="btn btn-outline-light">
+                <i class="bi bi-share"></i> Partager
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="movie-cast">
+            <h6>Cast</h6>
+            <div class="cast-list" id="castList">
+              <!-- Cast members will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Movies -->
+  <div class="related-movies">
+    <div class="container">
+      <h4>Films similaires</h4>
+      <div class="movies-grid" id="relatedMovies">
+        <!-- Related movies will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/watch.js"></script>
+
+</body>
+</html>

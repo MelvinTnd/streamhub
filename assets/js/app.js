@@ -48,197 +48,64 @@ async function tmdb(path, params = {}) {
   return data;
 }
 
-async function streamingApi(path, params = {}) {
-  const url = new URL(streamingApiBase + path);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  const res = await fetch(url.toString(), {
-    headers: {
-      'x-rapidapi-host': 'streaming-availability.p.rapidapi.com',
-      'x-rapidapi-key': rapidApiKey
-    }
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Streaming API error');
-  return data;
-}
-
-// Skeletons
-function mountHeroSkeleton() {
-  const hero = document.getElementById('hero');
-  hero.style.backgroundImage = 'none';
-  const content = hero.querySelector('.content');
-  content.innerHTML = `
-    <div class="skeleton skeleton-text" style="height:32px; width:60%; margin:0 auto 12px;"></div>
-    <div class="skeleton skeleton-text" style="height:14px; width:30%; margin:0 auto 8px;"></div>
-    <div class="skeleton skeleton-text" style="height:14px; width:40%; margin:0 auto 8px;"></div>
-    <div class="skeleton skeleton-text" style="height:14px; width:80%; margin:0 auto 8px;"></div>
-  `;
-}
-
-function mountSidebarSkeleton() {
-  const list = document.getElementById('sidebar-list');
-  if (!list) return;
-  list.innerHTML = '';
-  for (let i = 0; i < 10; i++) {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <div class="skeleton skeleton-thumb" style="width:50px; border-radius:6px;"></div>
-      <div class="skeleton skeleton-text" style="flex:1; height:12px;"></div>
-    `;
-    li.style.display = 'flex';
-    li.style.alignItems = 'center';
-    li.style.gap = '10px';
-    list.appendChild(li);
+async function fetchStreamingInfo(tmdbId) {
+  try {
+    const response = await fetch(`${streamingApiBase}/get/basic?country=fr&tmdb_id=movie/${tmdbId}`, {
+      headers: {
+        'X-RapidAPI-Key': rapidApiKey,
+        'X-RapidAPI-Host': 'streaming-availability.p.rapidapi.com'
+      }
+    });
+    return await response.json();
+  } catch (error) {
+    console.warn('Streaming info not available:', error);
+    return null;
   }
 }
 
-function mountGridSkeleton(containerId, count = 12) {
-  const grid = document.getElementById(containerId);
-  if (!grid) return;
-  const nodes = [];
-  for (let i = 0; i < count; i++) {
-    const col = document.createElement('div');
-    col.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
-    col.innerHTML = `
-      <div class="card">
-        <div class="card-figure">
-          <div class="skeleton skeleton-thumb" style="width:100%;"></div>
-        </div>
-        <div class="card-body">
-          <div class="skeleton skeleton-text" style="width:80%; margin-bottom:6px;"></div>
-          <div class="skeleton skeleton-text" style="width:40%;"></div>
-        </div>
-      </div>
-    `;
-    nodes.push(col);
-  }
-  grid.innerHTML = '';
-  grid.append(...nodes);
-}
-
-function mountRecsSkeleton() {
-  const recs = document.getElementById('recommendations');
-  if (!recs) return;
-  recs.innerHTML = '';
-  for (let r = 0; r < 3; r++) {
-    const row = document.createElement('div');
-    row.className = 'col-12';
-    const cards = Array.from({ length: 8 }).map(() => `
-      <div class="card">
-        <div class="card-figure">
-          <div class="skeleton skeleton-thumb" style="width:100%;"></div>
-        </div>
-        <div class="card-body py-2">
-          <div class="skeleton skeleton-text" style="width:80%; margin-bottom:6px;"></div>
-          <div class="skeleton skeleton-text" style="width:40%;"></div>
-        </div>
-      </div>
-    `).join('');
-    row.innerHTML = `
-      <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
-        <div class="skeleton skeleton-text" style="width:120px; height:20px;"></div>
-      </div>
-      <div class="h-scroll">${cards}</div>
-    `;
-    recs.appendChild(row);
-  }
-}
-
-// Données de démo
+// Demo data
 const demoMovies = [
   {
     id: 1,
-    title: "Dune",
-    release_date: "2021-10-22",
-    genre_ids: [28, 12, 878],
-    overview: "Paul Atreides, un jeune homme brillant et doué, doit se rendre sur la planète la plus dangereuse de l'univers pour assurer l'avenir de sa famille et de son peuple.",
-    poster_path: "/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
-    backdrop_path: "/jYEW5xZkZk2WTrdbMGAPFuBqbDc.jpg"
+    title: 'Dune',
+    overview: 'Paul Atreides, un jeune homme brillant et doué, doit se rendre sur la planète la plus dangereuse de l\'univers pour assurer l\'avenir de sa famille et de son peuple.',
+    poster_path: '/d5NXSklXo0qyIYkgV94XAgMIckC.jpg',
+    backdrop_path: '/jYEW5xZkZk2WTrdbMGAPFuBqbDc.jpg',
+    release_date: '2021-09-15',
+    genre_ids: [878, 12, 18],
+    vote_average: 8.0
   },
   {
     id: 2,
-    title: "Spider-Man: No Way Home",
-    release_date: "2021-12-17",
+    title: 'Spider-Man: No Way Home',
+    overview: 'Peter Parker est démasqué et ne peut plus séparer sa vie normale des enjeux de super-héros.',
+    poster_path: '/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
+    backdrop_path: '/14QbnygCuTO0vl7CAFmPf1fgZfV.jpg',
+    release_date: '2021-12-15',
     genre_ids: [28, 12, 878],
-    overview: "Peter Parker est démasqué et ne peut plus séparer sa vie normale des enjeux de super-héros. Quand il demande de l'aide au Docteur Strange, les enjeux deviennent encore plus dangereux.",
-    poster_path: "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
-    backdrop_path: "/14QbnygCuTO0vl7CAFmPf1fgZfV.jpg"
+    vote_average: 8.4
   },
   {
     id: 3,
-    title: "The Batman",
-    release_date: "2022-03-04",
-    genre_ids: [28, 80, 18],
-    overview: "Quand un tueur cible l'élite de Gotham avec une série de machinations sadiques, une piste d'indices cryptiques envoie Batman enquêter dans les bas-fonds.",
-    poster_path: "/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg",
-    backdrop_path: "/c6H7Z4u73ir3cIoCteuhJh7UCAR.jpg"
-  },
-  {
-    id: 4,
-    title: "Top Gun: Maverick",
-    release_date: "2022-05-27",
-    genre_ids: [28, 18],
-    overview: "Après plus de trente ans de service, Pete 'Maverick' Mitchell est là où il appartient, repoussant les limites en tant que pilote d'essai courageux.",
-    poster_path: "/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
-    backdrop_path: "/odJ4hx6g6vBt4lBWKFD1tI8WS4x.jpg"
-  },
-  {
-    id: 5,
-    title: "Black Widow",
-    release_date: "2021-07-09",
-    genre_ids: [28, 12, 53],
-    overview: "Natasha Romanoff, alias Black Widow, fait face à l'aspect le plus sombre de son passé quand une conspiration dangereuse liée à son histoire émerge.",
-    poster_path: "/qAZ0pzat24kLdO3o8ejmbLxyOac.jpg",
-    backdrop_path: "/keIxh0wPr2Ymj0Btjh4gW7JJ89e.jpg"
-  },
-  {
-    id: 6,
-    title: "Eternals",
-    release_date: "2021-11-05",
-    genre_ids: [28, 12, 878],
-    overview: "Les Éternels, une race d'êtres immortels qui ont vécu sur Terre et façonné son histoire et ses civilisations.",
-    poster_path: "/6AdXwFTRTAzggD2QUTt5B7JFGKL.jpg",
-    backdrop_path: "/fzKWwcaam9QSTaMSLORIGs3jlMu.jpg"
+    title: 'The Matrix Resurrections',
+    overview: 'Retour dans la Matrice avec Neo et Trinity pour une nouvelle aventure.',
+    poster_path: '/8c4a8kE7PizaGQQnditMmI1xbRp.jpg',
+    backdrop_path: '/eNI7PtK6DEYgZmHWP9gQNuff8pv.jpg',
+    release_date: '2021-12-22',
+    genre_ids: [28, 878, 53],
+    vote_average: 6.5
   }
 ];
 
-// Data loaders
-async function loadGenres() {
-  if (DEMO_MODE) {
-    genresMap = {
-      28: "Action",
-      12: "Aventure", 
-      16: "Animation",
-      35: "Comédie",
-      80: "Crime",
-      99: "Documentaire",
-      18: "Drame",
-      10751: "Famille",
-      14: "Fantasy",
-      36: "Histoire",
-      27: "Horreur",
-      10402: "Musique",
-      9648: "Mystère",
-      10749: "Romance",
-      878: "Science-Fiction",
-      10770: "Téléfilm",
-      53: "Thriller",
-      10752: "Guerre",
-      37: "Western"
-    };
-    return;
-  }
-  const { genres } = await tmdb('/genre/movie/list', { language: 'fr-FR' });
-  genresMap = Object.fromEntries(genres.map(g => [g.id, g.name]));
-}
-
+// API calls
 async function fetchTrending() {
   if (DEMO_MODE) {
     trendingCache = demoMovies;
-    return;
+    return trendingCache;
   }
-  const { results } = await tmdb('/trending/movie/day', { language: 'fr-FR' });
+  const { results } = await tmdb('/trending/movie/week', { language: 'fr-FR' });
   trendingCache = results || [];
+  return trendingCache;
 }
 
 async function fetchPopular(page = 1) {
@@ -249,6 +116,36 @@ async function fetchPopular(page = 1) {
   return results || [];
 }
 
+async function fetchGenres() {
+  if (DEMO_MODE) {
+    genresMap = {
+      28: 'Action',
+      12: 'Aventure',
+      16: 'Animation',
+      35: 'Comédie',
+      80: 'Crime',
+      99: 'Documentaire',
+      18: 'Drame',
+      10751: 'Famille',
+      14: 'Fantasy',
+      36: 'Histoire',
+      27: 'Horreur',
+      10402: 'Musique',
+      9648: 'Mystère',
+      10749: 'Romance',
+      878: 'Science-Fiction',
+      10770: 'Téléfilm',
+      53: 'Thriller',
+      10752: 'Guerre',
+      37: 'Western'
+    };
+    return genresMap;
+  }
+  const { genres } = await tmdb('/genre/movie/list', { language: 'fr-FR' });
+  genresMap = Object.fromEntries(genres.map(g => [g.id, g.name]));
+  return genresMap;
+}
+
 async function fetchByGenre(genreId, page = 1) {
   if (DEMO_MODE) {
     return demoMovies.filter(movie => movie.genre_ids.includes(genreId));
@@ -257,24 +154,53 @@ async function fetchByGenre(genreId, page = 1) {
   return results || [];
 }
 
+// Navigation functions
+function goToWatchPage(id, title) {
+  if (id && title) {
+    window.location.href = `watch.html?id=${id}`;
+  } else {
+    // For featured content without specific ID
+    window.location.href = `watch.html?id=1`;
+  }
+}
+
+function goToMoviePage(id, title) {
+  showMovieModal(id, title, '', '', '', '');
+}
+
+// Featured content functions
+function playFeatured() {
+  if (trendingCache.length > 0) {
+    const movie = trendingCache[0];
+    goToWatchPage(movie.id, titleOf(movie));
+  }
+}
+
+function showMovieInfo() {
+  if (trendingCache.length > 0) {
+    const movie = trendingCache[0];
+    showMovieModal(movie.id, titleOf(movie), movie.overview || '', imageUrl(movie.poster_path), (movie.genre_ids || []).map(id => genresMap[id]).filter(Boolean).join(', '), yearOf(movie));
+  }
+}
+
 // Renderers
 async function displayHero() {
   if (trendingCache.length === 0) await fetchTrending();
   const movie = trendingCache[0];
   if (!movie) return;
+  
+  document.getElementById('hero-title').textContent = titleOf(movie);
+  document.getElementById('hero-year').textContent = yearOf(movie);
+  document.getElementById('hero-genre').textContent = (movie.genre_ids || []).map(id => genresMap[id]).filter(Boolean).slice(0,3).join(', ') || 'Tendance';
+  document.getElementById('hero-summary').textContent = movie.overview || '';
+  
+  // Update hero background
   const hero = document.getElementById('hero');
-  hero.style.backgroundImage = `url('${imageUrl(movie.backdrop_path, 'w1280')}')`;
-  const content = hero.querySelector('.content');
-  content.innerHTML = `
-    <h1 id="hero-title">${titleOf(movie)}</h1>
-    <p id="hero-year">${yearOf(movie)}</p>
-    <p id="hero-genre">${(movie.genre_ids || []).map(id => genresMap[id]).filter(Boolean).slice(0,3).join(', ') || 'Tendance'}</p>
-    <p id="hero-summary">${movie.overview || ''}</p>
-    <div class="d-flex gap-2 justify-content-center mt-3">
-      <button class="btn btn-primary">Regarder</button>
-      <button class="btn btn-outline-light">Plus d'infos</button>
-    </div>
-  `;
+  if (movie.backdrop_path) {
+    hero.style.background = `linear-gradient(135deg, rgba(0, 224, 255, 0.1), rgba(168, 85, 247, 0.1)), url(${imageUrl(movie.backdrop_path, 'w1280')})`;
+    hero.style.backgroundSize = 'cover';
+    hero.style.backgroundPosition = 'center';
+  }
 }
 
 async function displaySidebar() {
@@ -287,6 +213,7 @@ async function displaySidebar() {
   items.forEach(movie => {
     const li = document.createElement('li');
     li.innerHTML = `<img src="${imageUrl(movie.poster_path, 'w154')}" alt="${titleOf(movie)}" loading="lazy"> ${titleOf(movie)}`;
+    li.onclick = () => goToWatchPage(movie.id, titleOf(movie));
     sidebarList && sidebarList.appendChild(li);
     sidebarListMobile && sidebarListMobile.appendChild(li.cloneNode(true));
   });
@@ -295,41 +222,34 @@ async function displaySidebar() {
 async function displayMovieGrid() {
   const movieGrid = document.getElementById('movie-grid');
   if (!movieGrid) return;
-  
+
   try {
     const movies = await fetchPopular(popularPage);
     console.log('Movies fetched:', movies.length);
-    
+
     if (!movies || movies.length === 0) {
       movieGrid.innerHTML = '<div class="col-12 text-center"><p>Aucun film trouvé</p></div>';
       return;
     }
-    
+
     // Clear existing content
     movieGrid.innerHTML = '';
-    
+
     if (!DEMO_MODE) {
-      // Fetch streaming info for first few movies (only in real mode)
-      const streamingPromises = movies.slice(0, 8).map(async (movie) => {
-        try {
-          const streamingData = await streamingApi(`/shows/movie/${movie.id}`);
+      // Fetch streaming info for each movie
+      const moviesWithStreaming = await Promise.all(
+        movies.map(async movie => {
+          const streamingData = await fetchStreamingInfo(movie.id);
           return { movie, streamingData };
-        } catch (e) {
-          console.log('Streaming API error for movie:', movie.id);
-          return { movie, streamingData: null };
-        }
-      });
-      
-      const moviesWithStreaming = await Promise.all(streamingPromises);
-      const remainingMovies = movies.slice(8).map(movie => ({ movie, streamingData: null }));
-      const allMovies = [...moviesWithStreaming, ...remainingMovies];
-      
-      const cards = allMovies.map(({ movie, streamingData }) => {
+        })
+      );
+
+      const cards = moviesWithStreaming.map(({ movie, streamingData }) => {
         const col = document.createElement('div');
         col.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
         const streamingIcons = getStreamingInfo(streamingData);
         col.innerHTML = `
-          <div class="card" onclick="showMovieModal(${movie.id}, '${titleOf(movie).replace(/'/g, "\\'")}', '${movie.overview ? movie.overview.replace(/'/g, "\\'") : ''}', '${imageUrl(movie.poster_path)}', '${(movie.genre_ids || []).map(id => genresMap[id]).filter(Boolean).join(', ')}', '${yearOf(movie)}')">
+          <div class="card" onclick="goToWatchPage(${movie.id}, '${titleOf(movie).replace(/'/g, "\\'")}')" data-movie-id="${movie.id}">
             <div class="card-figure">
               <img src="${imageUrl(movie.poster_path)}" class="card-img-top" alt="${titleOf(movie)}" loading="lazy">
               <div class="card-overlay">
@@ -352,7 +272,7 @@ async function displayMovieGrid() {
         const col = document.createElement('div');
         col.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
         col.innerHTML = `
-          <div class="card" onclick="showMovieModal(${movie.id}, '${titleOf(movie).replace(/'/g, "\\'")}', '${movie.overview ? movie.overview.replace(/'/g, "\\'") : ''}', '${imageUrl(movie.poster_path)}', '${(movie.genre_ids || []).map(id => genresMap[id]).filter(Boolean).join(', ')}', '${yearOf(movie)}')">
+          <div class="card" onclick="goToWatchPage(${movie.id}, '${titleOf(movie).replace(/'/g, "\\'")}')" data-movie-id="${movie.id}">
             <div class="card-figure">
               <img src="${imageUrl(movie.poster_path)}" class="card-img-top" alt="${titleOf(movie)}" loading="lazy">
               <div class="card-overlay">
@@ -379,17 +299,17 @@ async function displayMovieGrid() {
 async function displayRecommendations() {
   const recommendations = document.getElementById('recommendations');
   if (!recommendations) return;
-  
-  recommendations.innerHTML = '';
-  const genreIds = [28, 35, 18, 99];
-  
+
   try {
+    await fetchGenres();
+    const genreIds = [28, 35, 18, 99];
+
     const lists = await Promise.all(genreIds.map(id => fetchByGenre(id).catch(() => [])));
     lists.forEach((list, idx) => {
       const row = document.createElement('div');
       row.className = 'col-12';
       const title = ['Action', 'Comédie', 'Drame', 'Documentaire'][idx] || 'Recommandé';
-      
+
       if (!list || list.length === 0) {
         row.innerHTML = `
           <div class="d-flex align-items-center justify-content-between mb-2 mt-3">
@@ -402,9 +322,9 @@ async function displayRecommendations() {
         recommendations.appendChild(row);
         return;
       }
-      
+
       const items = list.slice(0, 12).map(movie => `
-        <div class="card" onclick="showMovieModal(${movie.id}, '${titleOf(movie).replace(/'/g, "\\'")}', '${movie.overview ? movie.overview.replace(/'/g, "\\'") : ''}', '${imageUrl(movie.poster_path)}', '${(movie.genre_ids || []).map(id => genresMap[id]).filter(Boolean).join(', ')}', '${yearOf(movie)}')">
+        <div class="card" onclick="goToWatchPage(${movie.id}, '${titleOf(movie).replace(/'/g, "\\'")}')" data-movie-id="${movie.id}">
           <div class="card-figure">
             <img src="${imageUrl(movie.poster_path)}" class="card-img-top" alt="${titleOf(movie)}" loading="lazy">
             <div class="card-overlay">
@@ -437,7 +357,7 @@ function showMovieModal(id, title, overview, poster, genres, year) {
   document.getElementById('modal-poster').src = poster;
   document.getElementById('modal-poster').alt = title;
   document.getElementById('modal-overview').textContent = overview || 'Aucun résumé disponible.';
-  
+
   // Genres
   const genresContainer = document.getElementById('modal-genres');
   genresContainer.innerHTML = '';
@@ -449,7 +369,7 @@ function showMovieModal(id, title, overview, poster, genres, year) {
       genresContainer.appendChild(badge);
     });
   }
-  
+
   // Streaming options (placeholder for now)
   const streamingContainer = document.getElementById('modal-streaming');
   streamingContainer.innerHTML = `
@@ -458,49 +378,63 @@ function showMovieModal(id, title, overview, poster, genres, year) {
     <a href="#" class="streaming-btn">🏰 Disney+</a>
     <a href="#" class="streaming-btn">🟣 HBO Max</a>
   `;
-  
+
   // Show modal
   const modal = new bootstrap.Modal(document.getElementById('movieModal'));
   modal.show();
 }
 
-// Boot
-window.onload = async () => {
-  console.log('Starting app...');
-  mountHeroSkeleton();
-  mountSidebarSkeleton();
-  mountGridSkeleton('movie-grid', 12);
-  mountRecsSkeleton();
-  
-  try {
-    console.log('Loading genres and trending...');
-    await Promise.all([loadGenres(), fetchTrending()]);
-    console.log('Genres loaded:', Object.keys(genresMap).length);
-    console.log('Trending loaded:', trendingCache.length);
-    
-    console.log('Displaying hero...');
-    await displayHero();
-    
-    console.log('Displaying sidebar, grid and recommendations...');
-    await Promise.all([displaySidebar(), displayMovieGrid(), displayRecommendations()]);
-    
-    console.log('App loaded successfully!');
-  } catch (e) {
-    console.error('App loading error:', e);
-  }
-  
-  const loadMore = document.getElementById('load-more');
-  if (loadMore) {
-    loadMore.addEventListener('click', async () => {
+// Load more functionality
+document.addEventListener('DOMContentLoaded', function() {
+  displayHero();
+  displayMovieGrid();
+  displaySidebar();
+  displayRecommendations();
+
+  // Load more button
+  const loadMoreBtn = document.getElementById('load-more');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', async () => {
       popularPage++;
-      try { 
-        console.log('Loading more movies, page:', popularPage);
-        await displayMovieGrid(); 
-      } catch (e) { 
-        console.error('Error loading more movies:', e); 
+      const movieGrid = document.getElementById('movie-grid');
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'col-12 text-center';
+      loadingDiv.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+      movieGrid.appendChild(loadingDiv);
+
+      try {
+        const newMovies = await fetchPopular(popularPage);
+        loadingDiv.remove();
+
+        if (newMovies && newMovies.length > 0) {
+          const cards = newMovies.map(movie => {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
+            col.innerHTML = `
+              <div class="card" onclick="goToWatchPage(${movie.id}, '${titleOf(movie).replace(/'/g, "\\'")}')" data-movie-id="${movie.id}">
+                <div class="card-figure">
+                  <img src="${imageUrl(movie.poster_path)}" class="card-img-top" alt="${titleOf(movie)}" loading="lazy">
+                  <div class="card-overlay">
+                    <span class="play">▶</span>
+                    <div class="streaming-platforms">🔴📦🏰</div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <h6 class="card-title mb-1">${titleOf(movie)}</h6>
+                  <p class="card-text">${yearOf(movie)}</p>
+                </div>
+              </div>
+            `;
+            return col;
+          });
+          movieGrid.append(...cards);
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error loading more movies:', error);
+        loadingDiv.remove();
       }
     });
   }
-};
-
-
+});

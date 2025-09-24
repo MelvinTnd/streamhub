@@ -15,7 +15,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-dark" style="background: transparent; border-bottom: 1px solid rgba(255,255,255,.06);">
     <div class="container d-flex align-items-center justify-content-between py-3">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="#" style="font-weight:800; letter-spacing:-0.02em;">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html" style="font-weight:800; letter-spacing:-0.02em;">
         <span style="color:#00e0ff;">Stream</span>Hub
       </a>
       <form class="d-none d-md-flex" role="search" style="flex:1; max-width:520px; margin: 0 16px;">
@@ -36,8 +36,8 @@
       <p id="hero-genre">Action, Drame</p>
       <p id="hero-summary">Résumé du film...</p>
       <div class="d-flex gap-2 justify-content-center mt-3">
-        <button class="btn btn-primary">Regarder</button>
-        <button class="btn btn-outline-light">Plus d'infos</button>
+        <button class="btn btn-primary" onclick="goToWatchPage()">Regarder</button>
+        <button class="btn btn-outline-light" onclick="showMovieInfo()">Plus d'infos</button>
       </div>
     </div>
   </div>
@@ -70,6 +70,7 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="assets/js/app.js"></script>
 
   <!-- Modal Film Details -->
@@ -121,9 +122,8 @@
         <div class="col-md-2">
           <h5>Films</h5>
           <ul class="list-unstyled">
-            <li><a href="#">Populaires</a></li>
+            <li><a href="index.html">Populaires</a></li>
             <li><a href="#">Tendances</a></li>
-            <li><a href="#">Nouveautés</a></li>
             <li><a href="#">Top Rated</a></li>
           </ul>
         </div>
